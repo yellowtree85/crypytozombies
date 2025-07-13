@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
 import {Script, console2} from "forge-std/Script.sol";
@@ -27,7 +27,9 @@ contract DeployZombieAttack is Script {
 
         vm.startBroadcast(account);
         zombieAttack = new ZombieAttack("ZombieAttack", "ZATK", _mostRecentlyDeployed);
+        // 给订阅者赋权限
         subscriptionManager.grantSubscriberRole(address(zombieAttack));
+        // 设置随机数的数量
         zombieAttack.setSenderNumWords(uint32(1));
         vm.stopBroadcast();
         return zombieAttack;

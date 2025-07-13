@@ -8,8 +8,9 @@ import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import {IVRFv2PlusSubscriptionManager} from "./interfaces/IVRFv2PlusSubscriptionManager.sol";
 import {IVRFCallBackInterface} from "src/interfaces/IVRFCallBackInterface.sol";
 import {console2} from "lib/forge-std/src/console2.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-contract ZombieAttack is ZombieHelper, IVRFCallBackInterface {
+contract ZombieAttack is ZombieHelper, IVRFCallBackInterface, ReentrancyGuard {
     /*//////////////////////////////////////////////////////////////
                                  ERRORS
     //////////////////////////////////////////////////////////////*/
@@ -43,7 +44,7 @@ contract ZombieAttack is ZombieHelper, IVRFCallBackInterface {
 
     modifier attackCheck() {
         uint256 requestId = s_attackToRequestId[msg.sender];
-        if (s_attackToRequestId[msg.sender] != 0) {
+        if (requestId != 0 && requestId != type(uint96).max) {
             revert ZombieAttack__YouAlreadAttackedAZombie(s_requestAttackInfos[requestId].targetId);
         }
         _;
@@ -69,8 +70,9 @@ contract ZombieAttack is ZombieHelper, IVRFCallBackInterface {
         subscriptionManager.setSenderNumWords(_numWords);
     }
 
-    function attack(uint256 _zombieId, uint256 _targetId) external attackCheck onlyOwnerOf(_zombieId) {
+    function attack(uint256 _zombieId, uint256 _targetId) external nonReentrant attackCheck onlyOwnerOf(_zombieId) {
         // get random data from vrf
+        s_attackToRequestId[msg.sender] = type(uint96).max;
         uint256 requestId = subscriptionManager.requestRandomWords();
         s_attackToRequestId[msg.sender] = requestId;
         s_requestAttackInfos[requestId] = AttackInfo(false, false, _zombieId, _targetId, 0);
@@ -122,5 +124,13 @@ contract ZombieAttack is ZombieHelper, IVRFCallBackInterface {
         delete s_requestAttackInfos[requestId];
 
         feedAndMultiply(_zombieId, _targetDna, "zombie");
+    }
+
+    function name() public view override returns (string memory) {
+        return super.name();
+    }
+
+    function symbol() public view override returns (string memory) {
+        return super.symbol();
     }
 }

@@ -14,28 +14,37 @@ contract DeployRandomNumberGenerator is Script {
         HelperConfig.NetworkConfig memory config = helperConfig.getConfig();
         AddConsumer addConsumer = new AddConsumer();
 
-        if (config.subscriptionId == 0) {
+        if (config.vrfConfig.subscriptionId == 0) {
             CreateSubscription createSubscription = new CreateSubscription();
             uint256 subscriptionId;
-            (subscriptionId, config.vrfCoordinatorV2_5) =
-                createSubscription.createSubscription(config.vrfCoordinatorV2_5, config.account);
-            config.subscriptionId = subscriptionId;
+            (subscriptionId, config.vrfConfig.vrfCoordinatorV2_5) =
+                createSubscription.createSubscription(config.vrfConfig.vrfCoordinatorV2_5, config.account);
+            config.vrfConfig.subscriptionId = subscriptionId;
 
             FundSubscription fundSubscription = new FundSubscription();
             fundSubscription.fundSubscription(
-                config.vrfCoordinatorV2_5, config.subscriptionId, config.link, config.account
+                config.vrfConfig.vrfCoordinatorV2_5,
+                config.vrfConfig.subscriptionId,
+                config.vrfConfig.link,
+                config.account
             );
             helperConfig.setConfig(block.chainid, config);
         }
         vm.startBroadcast(config.account);
         RandomNumberGenerator randomNumberGenerator = new RandomNumberGenerator(
-            config.subscriptionId, config.gasLane, config.callbackGasLimit, config.vrfCoordinatorV2_5
+            config.vrfConfig.subscriptionId,
+            config.vrfConfig.gasLane,
+            config.vrfConfig.callbackGasLimit,
+            config.vrfConfig.vrfCoordinatorV2_5
         );
         vm.stopBroadcast();
-        console2.log("RandomNumberGenerator deployed at: ", address(randomNumberGenerator));
+        console2.log("RandomNumberGenerator deployed to: ", address(randomNumberGenerator));
         // We already have a broadcast in here
         addConsumer.addConsumer(
-            address(randomNumberGenerator), config.vrfCoordinatorV2_5, config.subscriptionId, config.account
+            address(randomNumberGenerator),
+            config.vrfConfig.vrfCoordinatorV2_5,
+            config.vrfConfig.subscriptionId,
+            config.account
         );
 
         return (randomNumberGenerator, helperConfig);

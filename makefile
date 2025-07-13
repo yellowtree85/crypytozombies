@@ -18,7 +18,7 @@ clean  :; forge clean
 # Remove modules
 remove :; rm -rf .gitmodules && rm -rf .git/modules/* && rm -rf lib && touch .gitmodules && git add . && git commit -m "modules"
 
-install :; forge install openzeppelin/openzeppelin-contracts@v5.3.0 && forge install smartcontractkit/chainlink-brownie-contracts && forge install transmissions11/solmate@v6 && forge install cyfrin/foundry-devops
+install :; forge install openzeppelin/openzeppelin-contracts@v5.3.0 && forge install smartcontractkit/chainlink-brownie-contracts && forge install transmissions11/solmate@v6 && forge install cyfrin/foundry-devops && forge install uniswap/v3-periphery@v1.0.0 && forge install uniswap/v3-core@v1.0.0 && forge install Uniswap/swap-router-contracts@v1.1.0
 
 # Update Dependencies
 update:; forge update
@@ -34,6 +34,7 @@ format :; forge fmt
 anvil :; anvil -m 'test test test test test test test test test test test junk' --steps-tracing --block-time 7
 anvilSepolia :; anvil -m 'test test test test test test test test test test test junk' --steps-tracing --block-time 7 --fork-url $(SEPOLIA_RPC_URL)
 anvilMainnet :; anvil -m 'test test test test test test test test test test test junk' --steps-tracing --block-time 7 --fork-url $(MAINNET_ALCHEMY_RPC_URL)
+anvilMainnet2 :; anvil -m 'test test test test test test test test test test test junk' --steps-tracing --block-time 7 --fork-url https://reth-ethereum.ithaca.xyz/rpc
 anvilArbiSepolia :; anvil -m 'test test test test test test test test test test test junk' --steps-tracing --block-time 7 --fork-url $(ARBITRUM_SEPOLIA_RPC_URL)
 anvilHolesky :; anvil -m 'test test test test test test test test test test test junk' --steps-tracing --block-time 7 --fork-url $(HOLESKY_RPC_URL)
 NETWORK_ARGS := --rpc-url http://localhost:8545 --private-key $(DEFAULT_ANVIL_KEY) --broadcast -vvvvv
@@ -57,5 +58,9 @@ deploySepliaFork:
 
 deployZombie:
 	@forge script script/DeployZombieAttack.s.sol:DeployZombieAttack $(NETWORK_ARGS)
+deployNFTMarket:
+	@forge script script/DeployNFTMarket.s.sol:DeployNFTMarket $(NETWORK_ARGS)
+createRandomZombie:
+	@forge script script/InteractionsZombies.s.sol:CreateRandomZombie $(NETWORK_ARGS)
 verify-contract:
 	@forge verify-contract $(CONTRACT_ADDRESS) src/Raffle.sol:Raffle --etherscan-api-key $(ETHERSCAN_API_KEY) --rpc-url $(SEPOLIA_RPC_URL) --show-standard-json-input > Raffle.json

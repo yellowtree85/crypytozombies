@@ -44,7 +44,6 @@ abstract contract ERC721Permit is IERC721Permit, ERC721, EIP712 {
         return interfaceId == type(IERC721Permit).interfaceId || super.supportsInterface(interfaceId);
     }
 
-    ///@dev 可以多次重用签名信息，因为没有增加nonce，在transfer时增加nonce
     function permit(address spender, uint256 tokenId, uint256 deadline, uint8 v, bytes32 r, bytes32 s)
         external
         payable
@@ -54,16 +53,14 @@ abstract contract ERC721Permit is IERC721Permit, ERC721, EIP712 {
             revert ERC2612ExpiredSignature(deadline);
         }
 
-        address owner = ownerOf(tokenId);
-
         bytes32 structHash = keccak256(abi.encode(PERMIT_TYPEHASH, spender, tokenId, _useNonce(tokenId), deadline));
         bytes32 hash = _hashTypedDataV4(structHash);
         address signer = ECDSA.recover(hash, v, r, s);
 
+        address owner = ownerOf(tokenId);
         if (signer != owner) {
             revert ERC2612InvalidSigner(signer, owner);
         }
-
-        approve(spender, tokenId);
+        _approve(spender, tokenId, owner);
     }
 }

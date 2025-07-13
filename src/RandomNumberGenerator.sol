@@ -95,21 +95,4 @@ contract RandomNumberGenerator is VRFConsumerBaseV2Plus, AccessControl {
     function getRandowNumbers(address _user) external view returns (uint256[] memory) {
         return senderToRandomNumbers[_user];
     }
-
-    /**
-     * @dev getSubscription returns the subscription details
-     * @param subId  the subscription ID
-     * @return balance  the link balance of the subscription
-     * @return nativeBalance the native balance of the subscription
-     * @return reqCount requests made by the subscription
-     * @return owner  the owner of the subscription
-     * @return consumers the consumers of the subscription
-     */
-    function getSubscription(uint256 subId)
-        external
-        view
-        returns (uint96 balance, uint96 nativeBalance, uint64 reqCount, address owner, address[] memory consumers)
-    {
-        return s_vrfCoordinator.getSubscription(subId);
-    }
 }

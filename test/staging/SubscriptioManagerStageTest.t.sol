@@ -22,22 +22,74 @@ contract SubscriptioManagerTest is StdCheats, Test {
     uint32 callbackGasLimit;
     address vrfCoordinatorV2_5;
     address account;
+    address linkToken;
 
     address public PLAYER = makeAddr("player");
     uint256 public constant STARTING_USER_BALANCE = 10 ether;
 
     function setUp() external {
-        vm.roll(1);
+        if (block.chainid == 31337) {
+            vm.roll(1);
+        }
+
+        HelperConfig helper = new HelperConfig();
+        HelperConfig.NetworkConfig memory defaultConfig = helper.getConfig();
+        account = defaultConfig.account;
+        linkToken = defaultConfig.vrfConfig.link;
+        deal(linkToken, account, 10 ether);
+        vm.deal(account, 100 ether);
+
         DeployRandomNumberGenerator deployer = new DeployRandomNumberGenerator();
         (randomNumberGenerator, helperConfig) = deployer.run();
         vm.deal(PLAYER, STARTING_USER_BALANCE);
 
         HelperConfig.NetworkConfig memory config = helperConfig.getConfig();
-        subscriptionId = config.subscriptionId;
-        gasLane = config.gasLane;
-        callbackGasLimit = config.callbackGasLimit;
-        vrfCoordinatorV2_5 = config.vrfCoordinatorV2_5;
-        account = config.account;
+        subscriptionId = config.vrfConfig.subscriptionId;
+        gasLane = config.vrfConfig.gasLane;
+        callbackGasLimit = config.vrfConfig.callbackGasLimit;
+        vrfCoordinatorV2_5 = config.vrfConfig.vrfCoordinatorV2_5;
+    }
+
+    /// forge test --mt testDeployRandomNumberGeneratorOnMainNet --fork-url $MAINNET_ALCHEMY_RPC_URL -vvv
+    function testDeployRandomNumberGeneratorOnMainNet() public {
+        console2.log("Deploying RandomNumberGenerator on Mainnet");
+        if (block.chainid != 1) {
+            return;
+        }
+        vm.startPrank(account);
+        randomNumberGenerator.grantSubscriberRole(account);
+        randomNumberGenerator.setSenderNumWords(uint32(1));
+        vm.stopPrank();
+
+        vm.recordLogs();
+        vm.prank(account);
+        randomNumberGenerator.requestRandomWords(); // emits requestId
+        Vm.Log[] memory entries = vm.getRecordedLogs();
+        bytes32 requestId = entries[1].topics[1]; // get the requestId from the logs
+
+        // cast storage 0xD7f86b4b8Cae7D942340FF628F82735b7a20893a  --rpc-url $MAINNET_ALCHEMY_RPC_URL
+        // cast storage 0xD7f86b4b8Cae7D942340FF628F82735b7a20893a 0 --rpc-url $MAINNET_ALCHEMY_RPC_URL
+        // 0x000000000000000000000000cc4b5b07316be81ed6edb44ca61e4cab28a1950d
+        address vrfCoordinatorOwner = 0xcc4b5b07316Be81ED6edB44Ca61E4CaB28A1950D;
+        // vm.deal(vrfCoordinatorOwner, 100 ether);
+        // deal(linkToken, vrfCoordinatorOwner, 100 ether);
+        // vm.prank(vrfCoordinatorOwner);
+        // VRFCoordinatorV2_5Mock(vrfCoordinatorV2_5).fulfillRandomWords(
+        //     uint256(requestId), address(randomNumberGenerator)
+        // );
+        // fulfillRandomWords 需要真实执行交易，执行者必须是 Chainlink 的签名者。 正式环境的调用参数也不一样,需要真实链上的参数
+        // Function: fulfillRandomWords(tuple proof,tuple rc,bool onlyPremium)
+        // Assert
+        (uint96 balance, uint96 nativeBalance, uint64 reqCount, address owner, address[] memory consumers) =
+            VRFCoordinatorV2_5Mock(vrfCoordinatorV2_5).getSubscription(subscriptionId);
+
+        console2.log("RandomNumberGenerator deployed at: ", address(randomNumberGenerator));
+        console2.log("subscriptionId link balance: ", balance);
+        console2.log("subscriptionId reqCount: ", reqCount);
+        console2.log("subscriptionId owner: ", owner);
+        for (uint256 i = 0; i < consumers.length; i++) {
+            console2.log("subscriptionId consumers: ", consumers[i]);
+        }
     }
 
     /////////////////////////
@@ -61,10 +113,7 @@ contract SubscriptioManagerTest is StdCheats, Test {
         if (block.chainid != 31337) {
             return;
         }
-        // fulfillRandomWords
-        // s_vrfCallBackInterface.vrfCallback(s_requestId, randomWords);
-        // Act
-        // address player = vm.envAddress("ACCOUNT_SEPOLIA");
+
         vm.startPrank(account);
         randomNumberGenerator.grantSubscriberRole(account);
         randomNumberGenerator.setSenderNumWords(uint32(1));
@@ -85,7 +134,7 @@ contract SubscriptioManagerTest is StdCheats, Test {
 
         // Assert
         (uint96 balance, uint96 nativeBalance, uint64 reqCount, address owner, address[] memory consumers) =
-            randomNumberGenerator.getSubscription(subscriptionId);
+            VRFCoordinatorV2_5Mock(vrfCoordinatorV2_5).getSubscription(subscriptionId);
 
         console2.log("SubscriptionManager deployed at: ", address(randomNumberGenerator));
         console2.log("SubscriptionManager link balance: ", balance);

@@ -3,15 +3,19 @@ src = "src"
 out = "out"
 via_ir = true
 libs = ["lib"]
-
+# auto_detect_remappings = false  # 禁用自动检测
 remappings = [ "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
                "forge-std/=lib/forge-std/src/",
+               "foundry-devops/src/=lib/foundry-devops/src/",
                "@chainlink/contracts/=lib/chainlink-brownie-contracts/contracts/",
                "@solmate=lib/solmate/src/",
-               "foundry-devops/src=lib/foundry-devops/src"
+               "foundry-devops/src=lib/foundry-devops/src",
+               "@uniswap/v3-periphery/contracts/=lib/v3-periphery/contracts/",
+               "@uniswap/v3-core/contracts/=lib/v3-core/contracts/",
+               "@uniswap/swap-router-contracts/contracts/=lib/swap-router-contracts/contracts/"
             ]
 fs_permissions = [{ access = "read", path = "./broadcast" }]
-ffi = true
+# ffi = true
 [etherscan]
 mainnet = { key = "${ETHERSCAN_API_KEY}" }
 sepolia = { key = "${ETHERSCAN_API_KEY}" }

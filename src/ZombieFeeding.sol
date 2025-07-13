@@ -4,7 +4,6 @@ pragma solidity ^0.8.24;
 import {ZombieFactory} from "./ZombieFactory.sol";
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-// import {IVRFv2PlusSubscriptionManager} from "./interfaces/IVRFv2PlusSubscriptionManager.sol";
 
 interface IKittyInterface {
     function getKitty(uint256 _id)
@@ -26,19 +25,11 @@ interface IKittyInterface {
 
 abstract contract ZombieFeeding is ZombieFactory, Ownable {
     IKittyInterface kittyContract;
-    // IVRFv2PlusSubscriptionManager public subscriptionManager;
 
     modifier onlyOwnerOf(uint256 _zombieId) {
         require(msg.sender == ownerOf(_zombieId));
         _;
     }
-
-    // modifier onlyOwnerOrManagerOf(uint256 _zombieId) {
-    //     require(msg.sender == ownerOf(_zombieId) || msg.sender == address(subscriptionManager));
-    //     _;
-    // }
-
-    // constructor(string memory _name, string memory _symbol) ERC721(_name, _symbol) Ownable(msg.sender) {}
 
     function setKittyContractAddress(address _address) external virtual onlyOwner {
         kittyContract = IKittyInterface(_address);

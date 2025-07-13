@@ -11,7 +11,7 @@ import {CodeConstants} from "./HelperConfig.s.sol";
 contract CreateSubscription is Script {
     function createSubscriptionUsingConfig() public returns (uint256, address) {
         HelperConfig helperConfig = new HelperConfig();
-        address vrfCoordinatorV2_5 = helperConfig.getConfigByChainId(block.chainid).vrfCoordinatorV2_5;
+        address vrfCoordinatorV2_5 = helperConfig.getConfigByChainId(block.chainid).vrfConfig.vrfCoordinatorV2_5;
         address account = helperConfig.getConfigByChainId(block.chainid).account;
         return createSubscription(vrfCoordinatorV2_5, account);
     }
@@ -44,16 +44,15 @@ contract AddConsumer is Script {
 
     function addConsumerUsingConfig(address mostRecentlyDeployed) public {
         HelperConfig helperConfig = new HelperConfig();
-        uint256 subId = helperConfig.getConfig().subscriptionId;
-        address vrfCoordinatorV2_5 = helperConfig.getConfig().vrfCoordinatorV2_5;
+        uint256 subId = helperConfig.getConfig().vrfConfig.subscriptionId;
+        address vrfCoordinatorV2_5 = helperConfig.getConfig().vrfConfig.vrfCoordinatorV2_5;
         address account = helperConfig.getConfig().account;
 
         addConsumer(mostRecentlyDeployed, vrfCoordinatorV2_5, subId, account);
     }
 
     function run() external {
-        address mostRecentlyDeployed =
-            DevOpsTools.get_most_recent_deployment("VRFv2PlusSubscriptionManager", block.chainid);
+        address mostRecentlyDeployed = DevOpsTools.get_most_recent_deployment("RandomNumberGenerator", block.chainid);
         addConsumerUsingConfig(mostRecentlyDeployed);
     }
 }
@@ -63,9 +62,9 @@ contract FundSubscription is CodeConstants, Script {
 
     function fundSubscriptionUsingConfig() public {
         HelperConfig helperConfig = new HelperConfig();
-        uint256 subId = helperConfig.getConfig().subscriptionId;
-        address vrfCoordinatorV2_5 = helperConfig.getConfig().vrfCoordinatorV2_5;
-        address link = helperConfig.getConfig().link;
+        uint256 subId = helperConfig.getConfig().vrfConfig.subscriptionId;
+        address vrfCoordinatorV2_5 = helperConfig.getConfig().vrfConfig.vrfCoordinatorV2_5;
+        address link = helperConfig.getConfig().vrfConfig.link;
         address account = helperConfig.getConfig().account;
 
         if (subId == 0) {
