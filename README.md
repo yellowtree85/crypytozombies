@@ -64,3 +64,16 @@ $ forge --help
 $ anvil --help
 $ cast --help
 ```
+### uniswap
+```shell
+git clone https://github.com/Uniswap/swap-router-contracts.git
+cd swap-router-contracts
+git tag 可以列出所有 tag
+git checkout v1.1.0
+
+git describe --tags
+git log --oneline -n 5
+
+
+git clone --branch v1.1.0 --single-branch https://github.com/Uniswap/swap-router-contracts.git
+```
