@@ -63,4 +63,15 @@ abstract contract ERC721Permit is IERC721Permit, ERC721, EIP712 {
         }
         _approve(spender, tokenId, owner);
     }
+
+    // message we expect to have been signed
+    function getMessageHash(address _spender, uint256 _tokenId, uint256 _deadline)
+        public
+        view
+        virtual
+        returns (bytes32)
+    {
+        return
+            _hashTypedDataV4(keccak256(abi.encode(PERMIT_TYPEHASH, _spender, _tokenId, _nonces[_tokenId], _deadline)));
+    }
 }

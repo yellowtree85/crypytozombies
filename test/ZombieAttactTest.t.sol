@@ -626,6 +626,7 @@ contract ZombieAttactTest is Test {
     }
 
     /// forge test --mt testNFTMarketUSDCBuyNFT --fork-url $INFURA_MAINNET_URL
+    /// forge test --mt testNFTMarketUSDCBuyNFT --fork-url $SEPOLIA_RPC_URL
     function testNFTMarketUSDCBuyNFT() public {
         // mint token to owner
         console2.log("owner ", owner);
@@ -642,25 +643,12 @@ contract ZombieAttactTest is Test {
         assertEq(zombieAttack.nonces(tokenId), 0);
         assertEq(zombieAttack.balanceOf(owner), 1, "Owner should have 1 zombie");
 
-        /// assembly  digest
-        bytes32 domainSeparator = keccak256(
-            abi.encode(
-                eip712DomainTypeHash, // type hash
-                keccak256(bytes(eip712DomainName)), // name
-                keccak256(bytes(eip712DomainVersion)), // version
-                block.chainid, // chain id
-                address(zombieAttack) // contract address
-            )
-        );
+        (uint8 v, bytes32 r, bytes32 s) = signMessage(signerPrivateKey2, address(nftMarket), tokenId, deadline);
 
-        // 拼接 Hash
-        bytes32 structHash = keccak256(abi.encode(permitTypeHash, address(nftMarket), tokenId, nonce, deadline));
-
-        bytes32 digest = MessageHashUtils.toTypedDataHash(domainSeparator, structHash);
-        address signer = vm.addr(signerPrivateKey2);
-        vm.startPrank(signer);
-        (uint8 v, bytes32 r, bytes32 s) = vm.sign(signerPrivateKey2, digest);
-        vm.stopPrank();
+        // address signer = vm.addr(signerPrivateKey2);
+        // vm.startPrank(signer);
+        // (uint8 v, bytes32 r, bytes32 s) = vm.sign(signerPrivateKey2, digest);
+        // vm.stopPrank();
         bytes memory signature = abi.encodePacked(r, s, v); // note the order here is different from line above.
         console2.logBytes(signature);
         console2.log("spender :", address(nftMarket));
@@ -711,5 +699,14 @@ contract ZombieAttactTest is Test {
 
         assertEq(zombieAttack.ownerOf(tokenId), address(attacker));
         console2.log("attacker get usdt ", IERC20(usdt).balanceOf(attacker));
+    }
+
+    function signMessage(uint256 privKey, address _spender, uint256 _tokenId, uint256 _deadline)
+        public
+        view
+        returns (uint8 v, bytes32 r, bytes32 s)
+    {
+        bytes32 hashedMessage = zombieAttack.getMessageHash(_spender, _tokenId, _deadline);
+        (v, r, s) = vm.sign(privKey, hashedMessage);
     }
 }

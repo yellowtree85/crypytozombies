@@ -158,8 +158,8 @@ contract HelperConfig is CodeConstants, Script {
 
     function getSepoliaEthConfig() public pure returns (NetworkConfig memory sepoliaNetworkConfig) {
         VRFConfig memory vrfConfigInfo = VRFConfig({
-            // subscriptionId: 0, // If left as 0, our scripts will create one!
-            subscriptionId: 9985493892126651747780725050076838928105990851924659843866228520163437646077, // If left as 0, our scripts will create one!
+            subscriptionId: 0, // If left as 0, our scripts will create one!
+            // subscriptionId: 9985493892126651747780725050076838928105990851924659843866228520163437646077, // If left as 0, our scripts will create one!
             gasLane: 0x787d74caea10b2b357790d5b5247c2f63d1d91572a9846f780606e4d953677ae,
             callbackGasLimit: 500000, // 500,000 gas
             vrfCoordinatorV2_5: 0x9DdfaCa8183c41ad55329BdeeD9F6A8d53168B1B,
@@ -179,14 +179,14 @@ contract HelperConfig is CodeConstants, Script {
             uniswapV3Factory: 0x0227628f3F023bb0B980b67D528571c95c6DaC1c,
             swapRouter02: 0x3bFA4769FB09eefC5a80d6E87c3B9C650f7Ae48E,
             poolFee: POOL_FEE,
-            usdc: 0x65aFADD39029741B3b8f0756952C74678c9cEC93,
+            usdc: 0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238,
             usdt: 0x7169D38820dfd117C3FA1f22a697dBA58d90BA06,
-            dai: 0x68194a729C2450ad26072b3D33ADCccFa6EC6D2D,
+            dai: 0xFF34B3d4Aee8ddCd6F9AFFFB6Fe49bD371b8a357,
             weth: 0xdd13E55209Fd76AfE204dBda4007C227904f0a81
         });
 
         sepoliaNetworkConfig = NetworkConfig({
-            account: 0x99519313208858E2c35da7Dd5449449eA88a4493,
+            account: 0x7A947bAb2A44C465760347ab9c51313d31Bcc26c,
             vrfConfig: vrfConfigInfo,
             erc721PermitConfig: erc721PermitConfigInfo,
             uniswapConfig: uniswapConfig
