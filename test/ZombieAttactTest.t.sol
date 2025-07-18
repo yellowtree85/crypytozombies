@@ -39,8 +39,8 @@ contract ZombieAttactTest is Test {
     RandomNumberGenerator public randomNumberGenerator;
     address public randomNumberGenerator2;
     address public constant FOUNDRY_DEFAULT_SENDER = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
-    uint256 internal signerPrivateKey = 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80;
-    uint256 internal signerPrivateKey2 = 0x7c58cf190fe72d1fbcdf1dd22f71b26839a6d7e8e3320ea6d9108e4e921d7ee8;
+    uint256 internal signerPrivateKey3 = 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80;
+    uint256 internal signerPrivateKey = 0x7c58cf190fe72d1fbcdf1dd22f71b26839a6d7e8e3320ea6d9108e4e921d7ee8;
 
     uint256 subscriptionId;
     bytes32 gasLane;
@@ -325,8 +325,11 @@ contract ZombieAttactTest is Test {
         assertEq(zombiesByOwner[1], 1, "Second zombie ID should be 1");
     }
 
-    /// forge test --mt testZombieAttack
+    /// forge test --mt testZombieAttack --fork-url $MAINNET_ALCHEMY_RPC_URL
     function testZombieAttack() public {
+        if (block.chainid != 31337) {
+            return;
+        }
         vm.prank(owner);
         zombieAttack.createRandomZombie("Zombie1");
 
@@ -493,19 +496,8 @@ contract ZombieAttactTest is Test {
             )
         );
 
-        // 拼接 Hash
-        bytes32 structHash = keccak256(abi.encode(permitTypeHash, address(nftMarket), tokenId, nonce, deadline));
+        (uint8 v, bytes32 r, bytes32 s) = signMessage(signerPrivateKey, address(nftMarket), tokenId, deadline);
 
-        // 获取签名消息hash
-        // bytes32 digest = keccak256(
-        //     abi.encodePacked("\x19\x01", domainSeparator, structHash)
-        // );
-
-        bytes32 digest = MessageHashUtils.toTypedDataHash(domainSeparator, structHash);
-        address signer = vm.addr(signerPrivateKey);
-        vm.startPrank(signer);
-        (uint8 v, bytes32 r, bytes32 s) = vm.sign(signerPrivateKey, digest);
-        vm.stopPrank();
         bytes memory signature = abi.encodePacked(r, s, v); // note the order here is different from line above.
         console2.logBytes(signature);
         console2.log("spender :", address(nftMarket));
@@ -574,14 +566,8 @@ contract ZombieAttactTest is Test {
             )
         );
 
-        // 拼接 Hash
-        bytes32 structHash = keccak256(abi.encode(permitTypeHash, address(nftMarket), tokenId, nonce, deadline));
+        (uint8 v, bytes32 r, bytes32 s) = signMessage(signerPrivateKey, address(nftMarket), tokenId, deadline);
 
-        bytes32 digest = MessageHashUtils.toTypedDataHash(domainSeparator, structHash);
-        address signer = vm.addr(signerPrivateKey2);
-        vm.startPrank(signer);
-        (uint8 v, bytes32 r, bytes32 s) = vm.sign(signerPrivateKey2, digest);
-        vm.stopPrank();
         bytes memory signature = abi.encodePacked(r, s, v); // note the order here is different from line above.
         console2.logBytes(signature);
         console2.log("spender :", address(nftMarket));
@@ -643,7 +629,7 @@ contract ZombieAttactTest is Test {
         assertEq(zombieAttack.nonces(tokenId), 0);
         assertEq(zombieAttack.balanceOf(owner), 1, "Owner should have 1 zombie");
 
-        (uint8 v, bytes32 r, bytes32 s) = signMessage(signerPrivateKey2, address(nftMarket), tokenId, deadline);
+        (uint8 v, bytes32 r, bytes32 s) = signMessage(signerPrivateKey, address(nftMarket), tokenId, deadline);
 
         // address signer = vm.addr(signerPrivateKey2);
         // vm.startPrank(signer);

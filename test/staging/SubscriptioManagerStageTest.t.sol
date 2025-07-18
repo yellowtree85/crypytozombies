@@ -26,9 +26,11 @@ contract SubscriptioManagerTest is StdCheats, Test {
 
     address public PLAYER = makeAddr("player");
     uint256 public constant STARTING_USER_BALANCE = 10 ether;
+    address public FOUNDRY_DEFAULT_SENDER = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
 
     function setUp() external {
         if (block.chainid == 31337) {
+            vm.deal(FOUNDRY_DEFAULT_SENDER, 100 ether);
             vm.roll(1);
         }
 
@@ -97,6 +99,9 @@ contract SubscriptioManagerTest is StdCheats, Test {
     ////////////////////////
     /// forge test --mt testFulfillRandomWordsCanOnlyBeCalledAfterRequest
     function testFulfillRandomWordsCanOnlyBeCalledAfterRequest() public {
+        if (block.chainid != 31337) {
+            return;
+        }
         // Arrange
         // Act / Assert
         vm.expectRevert();

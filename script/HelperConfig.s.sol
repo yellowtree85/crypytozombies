@@ -211,6 +211,7 @@ contract HelperConfig is CodeConstants, Script {
                 try VRFCoordinatorV2_5Mock(mostRecentlyDeployedVRFCoordinator).getActiveSubscriptionIds(0, 1) returns (
                     uint256[] memory subscriptionids
                 ) {
+                    console2.log("get mostRecentlyCreated subscriptionId ........... ");
                     if (subscriptionids.length > 0) {
                         subscriptionId = subscriptionids[0];
                         console2.log("mostRecentlyCreated subscriptionId: ", subscriptionId);
@@ -223,11 +224,10 @@ contract HelperConfig is CodeConstants, Script {
                             console2.log("RandomNumberGenerator consumers: ", consumers[i]);
                         }
                     }
-                } catch Error(string memory reason) {
-                    // 捕获revert("reasonString") 和 require(false, "reasonString")
-                    console2.log("get mostRecentlyCreated subscriptionId error : ", reason);
+                } catch {
+                    console2.log("getConfig() failed");
                 }
-
+                console2.log("get mostRecentlyCreated subscriptionId error ........... ");
                 if (subscriptionId != 0) {
                     address mostRecentlyDeployedLinkToken =
                         DevOpsTools.get_most_recent_deployment("LinkToken", block.chainid);
@@ -236,9 +236,8 @@ contract HelperConfig is CodeConstants, Script {
                     console2.log("mostRecentlyDeployedLinkToken: ", mostRecentlyDeployedLinkToken);
                 }
             }
-        } catch Error(string memory reason) {
-            // 捕获revert("reasonString") 和 require(false, "reasonString")
-            console2.log("get mostRecentlyDeployedVRFCoordinator error : ", reason);
+        } catch {
+            console2.log("getConfig() failed");
         }
         if (vrfCoordinatorV2_5MockAddress == address(0)) {
             console2.log(unicode"⚠️ You have deployed a mock conract!");
