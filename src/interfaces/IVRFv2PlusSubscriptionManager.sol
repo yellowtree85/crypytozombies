@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.20;
 
 /// cast interface src/RandomNumberGenerator.sol:RandomNumberGenerator > IVRFv2PlusSubscriptionManager.txt
 interface IVRFv2PlusSubscriptionManager {
