@@ -25,7 +25,7 @@ mainnet = { key = "${ETHERSCAN_API_KEY}" }
 sepolia = { key = "${ETHERSCAN_API_KEY}" }
 
 [rpc_endpoints]
-mainnet = "${INFURA_MAINNET_URL}"
+mainnet = "${MAINNET_ALCHEMY_RPC_URL}"
 sepolia = "${SEPOLIA_RPC_URL}"
 arbitrum = "${ARBITRUM_ALCHEMY_RPC_URL}"
 arbitrum_sepolia = "${ARBITRUM_SEPOLIA_RPC_URL}"

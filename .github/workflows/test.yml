@@ -20,6 +20,7 @@ jobs:
       ARBITRUM_ALCHEMY_RPC_URL: ${{ secrets.ARBITRUM_ALCHEMY_RPC_URL }}
       ARBITRUM_SEPOLIA_RPC_URL: ${{ secrets.ARBITRUM_SEPOLIA_RPC_URL }}
       HOLESKY_RPC_URL: ${{ secrets.HOLESKY_RPC_URL }}
+      MAINNET_ALCHEMY_RPC_URL: ${{ secrets.MAINNET_ALCHEMY_RPC_URL }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -52,5 +53,5 @@ jobs:
       - name: Run Forge tests
         run: |
           echo "Running test with private RPC"
-          forge test --fork-url https://mainnet.infura.io/v3/${{ secrets.INFURA_API_KEY }} --fork-block-number 22951814
+          forge test --fork-url $MAINNET_ALCHEMY_RPC_URL --fork-block-number 22951814
         id: test
