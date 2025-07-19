@@ -8,7 +8,7 @@ import {WETH} from "@solmate/tokens/WETH.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {TransferHelper} from "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
-import {ISwapRouter02, IV3SwapRouter} from "@uniswap/swap-router-contracts/contracts/interfaces/ISwapRouter02.sol";
+import {ISwapRouter02, IV3SwapRouter} from "./interfaces//ISwapRouter02.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 /// forge inspect src/NFTMarket.sol:NFTMarket abi --json > NFTMarket.json
