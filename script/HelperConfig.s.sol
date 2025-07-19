@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 import {LinkToken} from "../test/mocks/LinkToken.sol";
 import {Script, console2} from "forge-std/Script.sol";
 import {VRFCoordinatorV2_5Mock} from "@chainlink/contracts/src/v0.8/vrf/mocks/VRFCoordinatorV2_5Mock.sol";
-import {DevOpsTools} from "foundry-devops/src/DevOpsTools.sol";
+import {DevOpsHelper} from "src/DevOpsHelper.sol";
 import {ERC20Mock} from "test/mocks/ERC20Mock.sol";
 
 abstract contract CodeConstants {
@@ -198,12 +198,12 @@ contract HelperConfig is CodeConstants, Script {
         if (localNetworkConfig.vrfConfig.vrfCoordinatorV2_5 != address(0)) {
             return localNetworkConfig;
         }
-
+        DevOpsHelper helper = new DevOpsHelper();
         address vrfCoordinatorV2_5MockAddress;
         address linkTokenAddress;
         uint256 subscriptionId;
         // Check to see if we have deployed a mock contract
-        try DevOpsTools.get_most_recent_deployment("VRFCoordinatorV2_5Mock", block.chainid) returns (
+        try helper.getDeployment("VRFCoordinatorV2_5Mock", block.chainid) returns (
             address mostRecentlyDeployedVRFCoordinator
         ) {
             if (mostRecentlyDeployedVRFCoordinator != address(0)) {
@@ -225,19 +225,18 @@ contract HelperConfig is CodeConstants, Script {
                         }
                     }
                 } catch {
-                    console2.log("getConfig() failed");
+                    console2.log("getOrCreateAnvilEthConfig() subscriptionId failed");
                 }
                 console2.log("get mostRecentlyCreated subscriptionId error ........... ");
                 if (subscriptionId != 0) {
-                    address mostRecentlyDeployedLinkToken =
-                        DevOpsTools.get_most_recent_deployment("LinkToken", block.chainid);
                     vrfCoordinatorV2_5MockAddress = mostRecentlyDeployedVRFCoordinator;
+                    address mostRecentlyDeployedLinkToken = helper.getDeployment("LinkToken", block.chainid);
                     linkTokenAddress = mostRecentlyDeployedLinkToken;
                     console2.log("mostRecentlyDeployedLinkToken: ", mostRecentlyDeployedLinkToken);
                 }
             }
         } catch {
-            console2.log("getConfig() failed");
+            console2.log("getOrCreateAnvilEthConfig() failed");
         }
         if (vrfCoordinatorV2_5MockAddress == address(0)) {
             console2.log(unicode"⚠️ You have deployed a mock conract!");
