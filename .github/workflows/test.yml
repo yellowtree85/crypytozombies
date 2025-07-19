@@ -20,13 +20,15 @@ jobs:
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
       
       - name: Install Python & solc-select
         run: |
           pip install solc-select
           solc-select install 0.8.20
           solc-select install 0.7.6
-          solc-select use 0.8.20  # 默认主版本，可根据你的 foundry.toml 决定
+          solc-select use 0.8.20
 
       - name: Show Forge version
         run: |
