@@ -20,6 +20,11 @@ jobs:
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
+      
+      - name: Install additional solc versions
+        run: |
+          forge install-solc 0.7.6
+          forge install-solc 0.8.20
 
       - name: Show Forge version
         run: |
