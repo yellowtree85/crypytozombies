@@ -7,7 +7,7 @@ on:
 
 env:
   FOUNDRY_PROFILE: ci
-  RPC_URL: https://mainnet.infura.io/v3/${{ secrets.INFURA_API_KEY }}
+  INFURA_API_KEY: ${{ secrets.INFURA_API_KEY }}
   
 jobs:
   check:
@@ -45,5 +45,5 @@ jobs:
       - name: Run Forge tests
         run: |
           echo "Running test with private RPC"
-          forge test --fork-url $RPC_URL
+          forge test --fork-url https://mainnet.infura.io/v3/$INFURA_API_KEY --fork-block-number 22951814
         id: test
